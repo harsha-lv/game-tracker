@@ -8,6 +8,8 @@ const gameRoutes = require('./routes/gameRoutes');
 const genreRoutes = require('./routes/genreRoutes');
 const developerRoutes = require('./routes/developerRoutes');
 
+const pool = require('./db/pool');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -21,13 +23,26 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Current user middleware (demo user: harsha)
-app.use((req, res, next) => {
-  req.currentUser = { id: 1, username: 'harsha' };
-  res.locals.currentUser = req.currentUser;
-  res.locals.error = null;
-  res.locals.success = null;
-  next();
+// Current user middleware (dynamic demo user: harsha)
+let cachedUser = null;
+app.use(async (req, res, next) => {
+  try {
+    if (!cachedUser) {
+      const result = await pool.query("SELECT id, username FROM users WHERE username = 'harsha' LIMIT 1");
+      if (result.rows.length > 0) {
+        cachedUser = result.rows[0];
+      } else {
+        cachedUser = { id: 1, username: 'harsha' };
+      }
+    }
+    req.currentUser = cachedUser;
+    res.locals.currentUser = req.currentUser;
+    res.locals.error = null;
+    res.locals.success = null;
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Routes
