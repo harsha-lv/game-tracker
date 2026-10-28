@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Developer: <%= developer.name %></h1>
+    <div class="page-subtitle">
+      <%= developer.country ? `Based in ${developer.country}` : 'Independent / Studio' %>
+      <% if (developer.website) { %>
+        &bull; <a href="<%= developer.website.startsWith('http') ? developer.website : `https://${developer.website}` %>" target="_blank" rel="noopener noreferrer">Official Website</a>
+      <% } %>
+    </div>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="/developers/<%= developer.id %>/edit" class="btn">Edit Developer</a>
+    <a href="/developers" class="btn">&larr; Back to Developers</a>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 class="panel-title">Games Developed by <%= developer.name %> (<%= games.length %>)</h2>
+
+  <% if (games.length === 0) { %>
+    <p style="color: var(--text-muted); font-size: 13px;">No games currently linked to this developer.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Release Year</th>
+            <th>Genres</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% games.forEach(game => { %>
+            <tr>
+              <td>
+                <strong><a href="/games/<%= game.id %>"><%= game.title %></a></strong>
+              </td>
+              <td><%= game.release_year || '—' %></td>
+              <td><%= game.genres_list || '—' %></td>
+              <td style="text-align: right;">
+                <a href="/games/<%= game.id %>" class="btn btn-sm">View Game</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="panel" style="border-color: rgba(207, 34, 46, 0.3); margin-top: 24px;">
+  <h2 class="panel-title" style="color: var(--danger-color);">Delete Developer</h2>
+  <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+    Deleting this developer will remove them from all linked games. <strong>The games themselves will NOT be deleted.</strong>
+  </p>
+  <form action="/developers/<%= developer.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete the developer &quot;<%= developer.name %>&quot;?');">
+    <button type="submit" class="btn btn-danger">Delete Developer</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

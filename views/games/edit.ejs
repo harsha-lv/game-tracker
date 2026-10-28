@@ -1,0 +1,126 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Edit Game: <%= game.title %></h1>
+    <div class="page-subtitle">Update catalog details and category assignments</div>
+  </div>
+  <div>
+    <a href="/games/<%= game.id %>" class="btn">&larr; Back to Game Details</a>
+  </div>
+</div>
+
+<div class="form-container">
+  <form action="/games/<%= game.id %>" method="POST">
+    <div class="form-group">
+      <label for="title">Game Title *</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        class="form-control" 
+        value="<%= game.title %>" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="release_year">Release Year</label>
+      <input 
+        type="number" 
+        id="release_year" 
+        name="release_year" 
+        class="form-control" 
+        min="1970" 
+        max="2100" 
+        value="<%= game.release_year || '' %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        class="form-control" 
+        rows="4"
+      ><%= game.description || '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <label style="margin-bottom: 0;">Genres</label>
+        <a href="/genres/new" style="font-size: 12px;" target="_blank">+ New Genre</a>
+      </div>
+      <% if (allGenres.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No genres created yet.</p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allGenres.forEach(genre => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="genres" 
+                value="<%= genre.id %>"
+                <%= selectedGenres.includes(genre.id) ? 'checked' : '' %>
+              >
+              <%= genre.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <label style="margin-bottom: 0;">Developer(s)</label>
+        <a href="/developers/new" style="font-size: 12px;" target="_blank">+ New Developer</a>
+      </div>
+      <% if (allDevelopers.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No developers created yet.</p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allDevelopers.forEach(dev => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="developers" 
+                value="<%= dev.id %>"
+                <%= selectedDevelopers.includes(dev.id) ? 'checked' : '' %>
+              >
+              <%= dev.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label>Platform(s)</label>
+      <% if (allPlatforms.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No platforms found.</p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allPlatforms.forEach(p => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="platforms" 
+                value="<%= p.id %>"
+                <%= selectedPlatforms.includes(p.id) ? 'checked' : '' %>
+              >
+              <%= p.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/games/<%= game.id %>" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

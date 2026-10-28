@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Add New Developer</h1>
+    <div class="page-subtitle">Register a game studio or developer</div>
+  </div>
+  <div>
+    <a href="/developers" class="btn">&larr; Back to Developers</a>
+  </div>
+</div>
+
+<div class="form-container">
+  <form action="/developers" method="POST">
+    <div class="form-group">
+      <label for="name">Studio / Developer Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        class="form-control" 
+        value="<%= developer.name || '' %>" 
+        placeholder="e.g. FromSoftware, Supergiant Games, Nintendo" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input 
+        type="text" 
+        id="country" 
+        name="country" 
+        class="form-control" 
+        value="<%= developer.country || '' %>" 
+        placeholder="e.g. Japan, United States, Poland"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="website">Website</label>
+      <input 
+        type="url" 
+        id="website" 
+        name="website" 
+        class="form-control" 
+        value="<%= developer.website || '' %>" 
+        placeholder="https://www.example.com"
+      >
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Developer</button>
+      <a href="/developers" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

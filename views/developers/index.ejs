@@ -1,0 +1,60 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Developers</h1>
+    <div class="page-subtitle">Game studios and creators</div>
+  </div>
+  <div>
+    <a href="/developers/new" class="btn btn-primary">+ Add New Developer</a>
+  </div>
+</div>
+
+<% if (developers.length === 0) { %>
+  <div class="empty-state">
+    <p>No developers registered yet.</p>
+    <a href="/developers/new" class="btn btn-primary">Create the First Developer</a>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Studio / Developer</th>
+          <th>Country</th>
+          <th>Website</th>
+          <th>Games Count</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% developers.forEach(dev => { %>
+          <tr>
+            <td>
+              <strong><a href="/developers/<%= dev.id %>"><%= dev.name %></a></strong>
+            </td>
+            <td><%= dev.country || '—' %></td>
+            <td>
+              <% if (dev.website) { %>
+                <a href="<%= dev.website.startsWith('http') ? dev.website : `https://${dev.website}` %>" target="_blank" rel="noopener noreferrer">
+                  <%= dev.website.replace(/^https?:\/\//, '') %>
+                </a>
+              <% } else { %>
+                —
+              <% } %>
+            </td>
+            <td>
+              <span class="tag"><%= dev.game_count %> <%= dev.game_count === 1 ? 'game' : 'games' %></span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <a href="/developers/<%= dev.id %>" class="btn btn-sm">View</a>
+              <a href="/developers/<%= dev.id %>/edit" class="btn btn-sm">Edit</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

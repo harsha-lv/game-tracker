@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Genre: <%= genre.name %></h1>
+    <div class="page-subtitle"><%= genre.description || 'No description provided.' %></div>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="/genres/<%= genre.id %>/edit" class="btn">Edit Genre</a>
+    <a href="/genres" class="btn">&larr; Back to Genres</a>
+  </div>
+</div>
+
+<div class="panel">
+  <h2 class="panel-title">Games in this Genre (<%= games.length %>)</h2>
+
+  <% if (games.length === 0) { %>
+    <p style="color: var(--text-muted); font-size: 13px;">No games currently tagged with this genre.</p>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Release Year</th>
+            <th>Developer</th>
+            <th style="text-align: right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% games.forEach(game => { %>
+            <tr>
+              <td>
+                <strong><a href="/games/<%= game.id %>"><%= game.title %></a></strong>
+              </td>
+              <td><%= game.release_year || '—' %></td>
+              <td><%= game.developers_list || '—' %></td>
+              <td style="text-align: right;">
+                <a href="/games/<%= game.id %>" class="btn btn-sm">View Game</a>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</div>
+
+<div class="panel" style="border-color: rgba(207, 34, 46, 0.3); margin-top: 24px;">
+  <h2 class="panel-title" style="color: var(--danger-color);">Delete Genre</h2>
+  <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+    Deleting this genre will remove it from all associated games. <strong>The games themselves will NOT be deleted.</strong>
+  </p>
+  <form action="/genres/<%= genre.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete the genre &quot;<%= genre.name %>&quot;?');">
+    <button type="submit" class="btn btn-danger">Delete Genre</button>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

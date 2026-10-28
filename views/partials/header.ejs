@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? `${title} — Game Tracker` : 'Game Tracker' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="nav-container">
+      <div style="display: flex; align-items: center; gap: 24px;">
+        <a href="/library" class="brand">Game Tracker</a>
+        <nav class="main-nav">
+          <a href="/library" class="<%= typeof activeNav !== 'undefined' && activeNav === 'library' ? 'active' : '' %>">My Library</a>
+          <a href="/games" class="<%= typeof activeNav !== 'undefined' && activeNav === 'games' ? 'active' : '' %>">Catalog</a>
+          <a href="/genres" class="<%= typeof activeNav !== 'undefined' && activeNav === 'genres' ? 'active' : '' %>">Genres</a>
+          <a href="/developers" class="<%= typeof activeNav !== 'undefined' && activeNav === 'developers' ? 'active' : '' %>">Developers</a>
+        </nav>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span class="user-badge"><%= currentUser ? currentUser.username : 'harsha' %></span>
+        <a href="/games/new" class="btn btn-primary btn-sm">+ Add Game</a>
+      </div>
+    </div>
+  </header>
+  <main class="container">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    <% if (typeof success !== 'undefined' && success) { %>
+      <div class="alert alert-success"><%= success %></div>
+    <% } %>

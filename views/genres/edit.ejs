@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Edit Genre: <%= genre.name %></h1>
+    <div class="page-subtitle">Update genre details</div>
+  </div>
+  <div>
+    <a href="/genres/<%= genre.id %>" class="btn">&larr; Back to Genre Details</a>
+  </div>
+</div>
+
+<div class="form-container">
+  <form action="/genres/<%= genre.id %>" method="POST">
+    <div class="form-group">
+      <label for="name">Genre Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        class="form-control" 
+        value="<%= genre.name %>" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        class="form-control" 
+        rows="3"
+      ><%= genre.description || '' %></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/genres/<%= genre.id %>" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

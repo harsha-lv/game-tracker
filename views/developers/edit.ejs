@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Edit Developer: <%= developer.name %></h1>
+    <div class="page-subtitle">Update developer details</div>
+  </div>
+  <div>
+    <a href="/developers/<%= developer.id %>" class="btn">&larr; Back to Developer Details</a>
+  </div>
+</div>
+
+<div class="form-container">
+  <form action="/developers/<%= developer.id %>" method="POST">
+    <div class="form-group">
+      <label for="name">Studio / Developer Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        class="form-control" 
+        value="<%= developer.name %>" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input 
+        type="text" 
+        id="country" 
+        name="country" 
+        class="form-control" 
+        value="<%= developer.country || '' %>"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="website">Website</label>
+      <input 
+        type="url" 
+        id="website" 
+        name="website" 
+        class="form-control" 
+        value="<%= developer.website || '' %>"
+      >
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <a href="/developers/<%= developer.id %>" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

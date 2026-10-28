@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Genres</h1>
+    <div class="page-subtitle">Categorize and browse games by genre</div>
+  </div>
+  <div>
+    <a href="/genres/new" class="btn btn-primary">+ Add New Genre</a>
+  </div>
+</div>
+
+<% if (genres.length === 0) { %>
+  <div class="empty-state">
+    <p>No genres created yet.</p>
+    <a href="/genres/new" class="btn btn-primary">Create the First Genre</a>
+  </div>
+<% } else { %>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Genre Name</th>
+          <th>Description</th>
+          <th>Games Count</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% genres.forEach(genre => { %>
+          <tr>
+            <td>
+              <strong><a href="/genres/<%= genre.id %>"><%= genre.name %></a></strong>
+            </td>
+            <td style="color: var(--text-muted); font-size: 13px;">
+              <%= genre.description || '—' %>
+            </td>
+            <td>
+              <span class="tag"><%= genre.game_count %> <%= genre.game_count === 1 ? 'game' : 'games' %></span>
+            </td>
+            <td style="text-align: right; white-space: nowrap;">
+              <a href="/genres/<%= genre.id %>" class="btn btn-sm">View</a>
+              <a href="/genres/<%= genre.id %>/edit" class="btn btn-sm">Edit</a>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+<% } %>
+
+<%- include('../partials/footer') %>

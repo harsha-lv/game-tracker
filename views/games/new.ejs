@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Add New Game</h1>
+    <div class="page-subtitle">Add a canonical entry to the master game catalog</div>
+  </div>
+  <div>
+    <a href="/games" class="btn">&larr; Back to Catalog</a>
+  </div>
+</div>
+
+<div class="form-container">
+  <form action="/games" method="POST">
+    <div class="form-group">
+      <label for="title">Game Title *</label>
+      <input 
+        type="text" 
+        id="title" 
+        name="title" 
+        class="form-control" 
+        value="<%= game.title || '' %>" 
+        placeholder="e.g. Elden Ring, Hollow Knight, Cyberpunk 2077" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="release_year">Release Year</label>
+      <input 
+        type="number" 
+        id="release_year" 
+        name="release_year" 
+        class="form-control" 
+        min="1970" 
+        max="2100" 
+        value="<%= game.release_year || '' %>" 
+        placeholder="e.g. 2022"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea 
+        id="description" 
+        name="description" 
+        class="form-control" 
+        rows="4" 
+        placeholder="Brief summary of the game, setting, gameplay mechanics..."
+      ><%= game.description || '' %></textarea>
+    </div>
+
+    <div class="form-group">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <label style="margin-bottom: 0;">Genres</label>
+        <a href="/genres/new" style="font-size: 12px;" target="_blank">+ New Genre</a>
+      </div>
+      <% if (allGenres.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No genres created yet. <a href="/genres/new">Create a genre</a></p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allGenres.forEach(genre => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="genres" 
+                value="<%= genre.id %>"
+                <%= selectedGenres.includes(genre.id) ? 'checked' : '' %>
+              >
+              <%= genre.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+        <label style="margin-bottom: 0;">Developer(s)</label>
+        <a href="/developers/new" style="font-size: 12px;" target="_blank">+ New Developer</a>
+      </div>
+      <% if (allDevelopers.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No developers created yet. <a href="/developers/new">Create a developer</a></p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allDevelopers.forEach(dev => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="developers" 
+                value="<%= dev.id %>"
+                <%= selectedDevelopers.includes(dev.id) ? 'checked' : '' %>
+              >
+              <%= dev.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label>Platform(s)</label>
+      <% if (allPlatforms.length === 0) { %>
+        <p style="font-size: 12px; color: var(--text-muted);">No platforms found.</p>
+      <% } else { %>
+        <div class="checkbox-group">
+          <% allPlatforms.forEach(p => { %>
+            <label class="checkbox-label">
+              <input 
+                type="checkbox" 
+                name="platforms" 
+                value="<%= p.id %>"
+                <%= selectedPlatforms.includes(p.id) ? 'checked' : '' %>
+              >
+              <%= p.name %>
+            </label>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <div class="panel" style="background-color: #fafbfc; margin-top: 20px;">
+      <h3 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">My Library Tracking (Optional)</h3>
+      <label class="checkbox-label" style="margin-bottom: 12px;">
+        <input type="checkbox" name="add_to_library" value="1" checked>
+        Also add this game to my personal library immediately
+      </label>
+
+      <div class="form-group" style="margin-bottom: 0;">
+        <label for="library_status">Initial Status</label>
+        <select id="library_status" name="library_status" class="form-control">
+          <option value="Want to Play" selected>Want to Play</option>
+          <option value="Currently Playing">Currently Playing</option>
+          <option value="Completed">Completed</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Game</button>
+      <a href="/games" class="btn">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../partials/footer') %>

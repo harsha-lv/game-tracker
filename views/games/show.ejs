@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title"><%= game.title %></h1>
+    <% if (game.release_year) { %>
+      <div class="page-subtitle">Released in <%= game.release_year %></div>
+    <% } %>
+  </div>
+  <div style="display: flex; gap: 8px;">
+    <a href="/games/<%= game.id %>/edit" class="btn">Edit Game</a>
+    <a href="/games" class="btn">&larr; Back to Catalog</a>
+  </div>
+</div>
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+  <div>
+    <div class="panel">
+      <h2 class="panel-title">Game Overview</h2>
+      
+      <div class="meta-grid">
+        <div class="meta-label">Genres:</div>
+        <div>
+          <% if (genres.length > 0) { %>
+            <% genres.forEach(g => { %>
+              <a href="/genres/<%= g.id %>" class="tag"><%= g.name %></a>
+            <% }) %>
+          <% } else { %>
+            <span style="color: var(--text-muted);">None specified</span>
+          <% } %>
+        </div>
+
+        <div class="meta-label">Developer(s):</div>
+        <div>
+          <% if (developers.length > 0) { %>
+            <% developers.forEach(d => { %>
+              <a href="/developers/<%= d.id %>" class="tag"><%= d.name %></a>
+            <% }) %>
+          <% } else { %>
+            <span style="color: var(--text-muted);">None specified</span>
+          <% } %>
+        </div>
+
+        <div class="meta-label">Platforms:</div>
+        <div>
+          <% if (platforms.length > 0) { %>
+            <% platforms.forEach(p => { %>
+              <span class="tag"><%= p.name %></span>
+            <% }) %>
+          <% } else { %>
+            <span style="color: var(--text-muted);">None specified</span>
+          <% } %>
+        </div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <h3 style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Description</h3>
+        <p style="white-space: pre-line; line-height: 1.6;">
+          <%= game.description || 'No description provided.' %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Catalog Admin Actions -->
+    <div class="panel" style="border-color: rgba(207, 34, 46, 0.3);">
+      <h2 class="panel-title" style="color: var(--danger-color);">Danger Zone</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+        Deleting this game will remove it completely from the master catalog, including all user library records and category associations.
+      </p>
+      <form action="/games/<%= game.id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete <%= game.title %> from the catalog? This action cannot be undone.');">
+        <button type="submit" class="btn btn-danger">Delete Game from Catalog</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Sidebar: User Library Playthrough Widget -->
+  <div>
+    <div class="panel" style="background-color: #fafbfc;">
+      <h2 class="panel-title">Your Playthrough Status</h2>
+
+      <% if (tracking) { %>
+        <div style="margin-bottom: 16px;">
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Status</div>
+          <div>
+            <% if (tracking.status === 'Currently Playing') { %>
+              <span class="badge badge-playing" style="font-size: 13px; padding: 4px 10px;">Currently Playing</span>
+            <% } else if (tracking.status === 'Want to Play') { %>
+              <span class="badge badge-want" style="font-size: 13px; padding: 4px 10px;">Want to Play</span>
+            <% } else if (tracking.status === 'Completed') { %>
+              <span class="badge badge-completed" style="font-size: 13px; padding: 4px 10px;">Completed</span>
+            <% } else { %>
+              <span class="badge badge-hold" style="font-size: 13px; padding: 4px 10px;"><%= tracking.status %></span>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="meta-grid" style="grid-template-columns: 90px 1fr; margin-bottom: 16px;">
+          <div class="meta-label">Rating:</div>
+          <div><strong><%= tracking.rating ? `${tracking.rating} / 10` : 'Not rated' %></strong></div>
+
+          <div class="meta-label">Time Played:</div>
+          <div><strong><%= tracking.hours_played || 0 %> hrs</strong></div>
+        </div>
+
+        <% if (tracking.review_notes) { %>
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 4px;">Your Notes</div>
+            <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; font-size: 13px; white-space: pre-line;">
+              <%= tracking.review_notes %>
+            </div>
+          </div>
+        <% } %>
+
+        <div style="display: flex; gap: 8px; margin-top: 16px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+          <a href="/library/<%= tracking.id %>/edit" class="btn btn-primary btn-sm">Update Progress</a>
+          <form action="/library/<%= tracking.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Remove <%= game.title %> from your library?');">
+            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+          </form>
+        </div>
+
+      <% } else { %>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          This game is not currently in your library.
+        </p>
+
+        <form action="/library" method="POST">
+          <input type="hidden" name="game_id" value="<%= game.id %>">
+          
+          <div class="form-group">
+            <label for="status">Add to Status</label>
+            <select id="status" name="status" class="form-control" required>
+              <option value="Want to Play">Want to Play</option>
+              <option value="Currently Playing">Currently Playing</option>
+              <option value="Completed">Completed</option>
+              <option value="On Hold">On Hold</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">+ Add to My Library</button>
+        </form>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
