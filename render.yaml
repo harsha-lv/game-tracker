@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: game-tracker
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run db:init && npm run db:seed && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: game-tracker-db
+          property: connectionString
+
+databases:
+  - name: game-tracker-db
+    plan: free
+    databaseName: game_tracker
