@@ -1,34 +1,36 @@
-require('dotenv').config();
-const express = require('express');
-const path = require('path');
-const methodOverride = require('method-override');
+import dotenv from 'dotenv';
+dotenv.config();
 
-const libraryRoutes = require('./routes/libraryRoutes');
-const gameRoutes = require('./routes/gameRoutes');
-const genreRoutes = require('./routes/genreRoutes');
-const developerRoutes = require('./routes/developerRoutes');
+import express, { Request, Response, NextFunction } from 'express';
+import path from 'path';
+import methodOverride from 'method-override';
 
-const pool = require('./db/pool');
+import pool from './db/pool';
+import { User } from './types';
+import libraryRoutes from './routes/libraryRoutes';
+import gameRoutes from './routes/gameRoutes';
+import genreRoutes from './routes/genreRoutes';
+import developerRoutes from './routes/developerRoutes';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // View engine setup
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.resolve(process.cwd(), 'views'));
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 // Current user middleware (dynamic demo user: harsha)
-let cachedUser = null;
-app.use(async (req, res, next) => {
+let cachedUser: User | null = null;
+app.use(async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!cachedUser) {
-      const result = await pool.query("SELECT id, username FROM users WHERE username = 'harsha' LIMIT 1");
+      const result = await pool.query<User>("SELECT id, username FROM users WHERE username = 'harsha' LIMIT 1");
       if (result.rows.length > 0) {
         cachedUser = result.rows[0];
       } else {
@@ -46,14 +48,14 @@ app.use(async (req, res, next) => {
 });
 
 // Routes
-app.get('/', (req, res) => res.redirect('/library'));
+app.get('/', (req: Request, res: Response) => res.redirect('/library'));
 app.use('/library', libraryRoutes);
 app.use('/games', gameRoutes);
 app.use('/genres', genreRoutes);
 app.use('/developers', developerRoutes);
 
 // 404 Handler
-app.use((req, res) => {
+app.use((req: Request, res: Response) => {
   res.status(404).render('404', {
     title: 'Page Not Found',
     activeNav: ''
@@ -61,7 +63,7 @@ app.use((req, res) => {
 });
 
 // Error Handler
-app.use((err, req, res, next) => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error('Server error:', err);
   res.status(500).send('Internal Server Error: ' + err.message);
 });
@@ -73,4 +75,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = app;
+export default app;

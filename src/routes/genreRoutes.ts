@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const genreController = require('../controllers/genreController');
+import { Router } from 'express';
+import * as genreController from '../controllers/genreController';
+
+const router = Router();
 
 router.get('/', genreController.listGenres);
 router.get('/new', genreController.newGenreForm);
@@ -10,4 +11,4 @@ router.get('/:id/edit', genreController.editGenreForm);
 router.post('/:id', genreController.updateGenre);
 router.post('/:id/delete', genreController.deleteGenre);
 
-module.exports = router;
+export default router;

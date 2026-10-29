@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const developerController = require('../controllers/developerController');
+import { Router } from 'express';
+import * as developerController from '../controllers/developerController';
+
+const router = Router();
 
 router.get('/', developerController.listDevelopers);
 router.get('/new', developerController.newDeveloperForm);
@@ -10,4 +11,4 @@ router.get('/:id/edit', developerController.editDeveloperForm);
 router.post('/:id', developerController.updateDeveloper);
 router.post('/:id/delete', developerController.deleteDeveloper);
 
-module.exports = router;
+export default router;

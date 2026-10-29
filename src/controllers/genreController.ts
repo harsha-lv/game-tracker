@@ -1,6 +1,8 @@
-const pool = require('../db/pool');
+import { Request, Response, NextFunction } from 'express';
+import pool from '../db/pool';
+import { Genre, Game } from '../types';
 
-exports.listGenres = async (req, res, next) => {
+export const listGenres = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const query = `
       SELECT g.id, g.name, g.description, COUNT(gg.game_id)::int AS game_count
@@ -9,7 +11,7 @@ exports.listGenres = async (req, res, next) => {
       GROUP BY g.id
       ORDER BY g.name ASC;
     `;
-    const { rows: genres } = await pool.query(query);
+    const { rows: genres } = await pool.query<Genre>(query);
     res.render('genres/index', {
       title: 'Genres',
       activeNav: 'genres',
@@ -20,12 +22,13 @@ exports.listGenres = async (req, res, next) => {
   }
 };
 
-exports.showGenre = async (req, res, next) => {
+export const showGenre = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   try {
-    const genreResult = await pool.query('SELECT * FROM genres WHERE id = $1', [id]);
+    const genreResult = await pool.query<Genre>('SELECT * FROM genres WHERE id = $1', [id]);
     if (genreResult.rows.length === 0) {
-      return res.status(404).render('404', { title: 'Genre Not Found' });
+      res.status(404).render('404', { title: 'Genre Not Found' });
+      return;
     }
     const genre = genreResult.rows[0];
 
@@ -40,7 +43,7 @@ exports.showGenre = async (req, res, next) => {
       GROUP BY g.id
       ORDER BY g.title ASC;
     `;
-    const { rows: games } = await pool.query(gamesQuery, [id]);
+    const { rows: games } = await pool.query<Game>(gamesQuery, [id]);
 
     res.render('genres/show', {
       title: genre.name,
@@ -53,7 +56,7 @@ exports.showGenre = async (req, res, next) => {
   }
 };
 
-exports.newGenreForm = (req, res) => {
+export const newGenreForm = (req: Request, res: Response): void => {
   res.render('genres/new', {
     title: 'New Genre',
     activeNav: 'genres',
@@ -62,42 +65,45 @@ exports.newGenreForm = (req, res) => {
   });
 };
 
-exports.createGenre = async (req, res, next) => {
+export const createGenre = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { name, description } = req.body;
   if (!name || !name.trim()) {
-    return res.render('genres/new', {
+    res.render('genres/new', {
       title: 'New Genre',
       activeNav: 'genres',
       genre: { name, description },
       error: 'Genre name is required.'
     });
+    return;
   }
 
   try {
-    const result = await pool.query(
+    const result = await pool.query<{ id: number }>(
       'INSERT INTO genres (name, description) VALUES ($1, $2) RETURNING id',
       [name.trim(), description ? description.trim() : null]
     );
     res.redirect(`/genres/${result.rows[0].id}`);
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === '23505') {
-      return res.render('genres/new', {
+      res.render('genres/new', {
         title: 'New Genre',
         activeNav: 'genres',
         genre: { name, description },
         error: 'A genre with that name already exists.'
       });
+      return;
     }
     next(err);
   }
 };
 
-exports.editGenreForm = async (req, res, next) => {
+export const editGenreForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   try {
-    const result = await pool.query('SELECT * FROM genres WHERE id = $1', [id]);
+    const result = await pool.query<Genre>('SELECT * FROM genres WHERE id = $1', [id]);
     if (result.rows.length === 0) {
-      return res.status(404).render('404', { title: 'Genre Not Found' });
+      res.status(404).render('404', { title: 'Genre Not Found' });
+      return;
     }
     res.render('genres/edit', {
       title: `Edit ${result.rows[0].name}`,
@@ -110,17 +116,18 @@ exports.editGenreForm = async (req, res, next) => {
   }
 };
 
-exports.updateGenre = async (req, res, next) => {
+export const updateGenre = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   const { name, description } = req.body;
 
   if (!name || !name.trim()) {
-    return res.render('genres/edit', {
+    res.render('genres/edit', {
       title: 'Edit Genre',
       activeNav: 'genres',
       genre: { id, name, description },
       error: 'Genre name is required.'
     });
+    return;
   }
 
   try {
@@ -129,20 +136,21 @@ exports.updateGenre = async (req, res, next) => {
       [name.trim(), description ? description.trim() : null, id]
     );
     res.redirect(`/genres/${id}`);
-  } catch (err) {
+  } catch (err: any) {
     if (err.code === '23505') {
-      return res.render('genres/edit', {
+      res.render('genres/edit', {
         title: 'Edit Genre',
         activeNav: 'genres',
         genre: { id, name, description },
         error: 'A genre with that name already exists.'
       });
+      return;
     }
     next(err);
   }
 };
 
-exports.deleteGenre = async (req, res, next) => {
+export const deleteGenre = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   try {
     await pool.query('DELETE FROM genres WHERE id = $1', [id]);

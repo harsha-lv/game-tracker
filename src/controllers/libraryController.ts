@@ -1,11 +1,12 @@
-const pool = require('../db/pool');
+import { Request, Response, NextFunction } from 'express';
+import pool from '../db/pool';
+import { UserGame, LibraryCounts } from '../types';
 
-exports.listLibrary = async (req, res, next) => {
+export const listLibrary = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const userId = req.currentUser ? req.currentUser.id : 1;
-  const currentStatus = req.query.status || 'all';
+  const currentStatus = (req.query.status as string) || 'all';
 
   try {
-    // 1. Fetch counts for filter tabs
     const countsQuery = `
       SELECT 
         COUNT(*)::int AS total_count,
@@ -17,7 +18,7 @@ exports.listLibrary = async (req, res, next) => {
       FROM user_games
       WHERE user_id = $1;
     `;
-    const { rows: countsRows } = await pool.query(countsQuery, [userId]);
+    const { rows: countsRows } = await pool.query<LibraryCounts>(countsQuery, [userId]);
     const counts = countsRows[0] || {
       total_count: 0,
       want_count: 0,
@@ -27,9 +28,8 @@ exports.listLibrary = async (req, res, next) => {
       dropped_count: 0
     };
 
-    // 2. Fetch tracked games based on filter
     let filterCondition = '';
-    const queryParams = [userId];
+    const queryParams: any[] = [userId];
 
     if (currentStatus !== 'all') {
       queryParams.push(currentStatus);
@@ -59,7 +59,7 @@ exports.listLibrary = async (req, res, next) => {
       GROUP BY ug.id, g.id
       ORDER BY ug.updated_at DESC;
     `;
-    const { rows: trackedGames } = await pool.query(gamesQuery, queryParams);
+    const { rows: trackedGames } = await pool.query<UserGame>(gamesQuery, queryParams);
 
     res.render('library/index', {
       title: 'My Library',
@@ -73,12 +73,13 @@ exports.listLibrary = async (req, res, next) => {
   }
 };
 
-exports.addToLibrary = async (req, res, next) => {
+export const addToLibrary = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const userId = req.currentUser ? req.currentUser.id : 1;
   const { game_id, status, rating, hours_played, review_notes } = req.body;
 
   if (!game_id) {
-    return res.redirect('/games');
+    res.redirect('/games');
+    return;
   }
 
   const ratingVal = rating && !isNaN(parseInt(rating, 10)) ? parseInt(rating, 10) : null;
@@ -104,7 +105,7 @@ exports.addToLibrary = async (req, res, next) => {
   }
 };
 
-exports.editLibraryEntryForm = async (req, res, next) => {
+export const editLibraryEntryForm = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   const userId = req.currentUser ? req.currentUser.id : 1;
 
@@ -115,10 +116,11 @@ exports.editLibraryEntryForm = async (req, res, next) => {
       JOIN games g ON ug.game_id = g.id
       WHERE ug.id = $1 AND ug.user_id = $2;
     `;
-    const { rows } = await pool.query(query, [id, userId]);
+    const { rows } = await pool.query<UserGame>(query, [id, userId]);
 
     if (rows.length === 0) {
-      return res.status(404).render('404', { title: 'Entry Not Found' });
+      res.status(404).render('404', { title: 'Entry Not Found' });
+      return;
     }
 
     res.render('library/edit', {
@@ -132,7 +134,7 @@ exports.editLibraryEntryForm = async (req, res, next) => {
   }
 };
 
-exports.updateLibraryEntry = async (req, res, next) => {
+export const updateLibraryEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   const userId = req.currentUser ? req.currentUser.id : 1;
   const { status, rating, hours_played, review_notes } = req.body;
@@ -155,12 +157,11 @@ exports.updateLibraryEntry = async (req, res, next) => {
   }
 };
 
-exports.deleteLibraryEntry = async (req, res, next) => {
+export const deleteLibraryEntry = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { id } = req.params;
   const userId = req.currentUser ? req.currentUser.id : 1;
 
   try {
-    // Only removes the tracking entry from the user's library. Catalog game stays intact!
     await pool.query('DELETE FROM user_games WHERE id = $1 AND user_id = $2', [id, userId]);
     res.redirect('/library');
   } catch (err) {
